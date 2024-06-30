@@ -21,7 +21,9 @@ curl "http://127.0.0.1:5000/?url=<website-url>"
 Replace <website-url> with the URL you want to analyze, such as https://www.example.com.
 
 
-## Prerequisites
+## Prerequisites and Deployment link
+
+deploy link- https://website-analyzer-nrhzwchifhcavlwer7xhfm.streamlit.app/
 
 Before running the application, ensure you have the following installed:
 
