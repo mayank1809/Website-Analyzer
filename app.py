@@ -1,36 +1,38 @@
-from flask import Flask, request, jsonify
+import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import socket
 import dns.resolver
 from urllib.parse import urlparse, urljoin
 
-app = Flask(__name__)
+def main():
+    st.title("Website Analyzer")
 
-
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    url = request.args.get('url')
+    url = st.text_input("Enter a website URL:")
     if not url:
-        return jsonify({'error': 'No URL provided'}), 400
+        st.warning("Please enter a website URL.")
+        return
 
-    try:
-        domain_info = get_domain_info(url)
-        subdomains = get_subdomains(url)
-        assets = get_assets(url)
+    if st.button("Analyze"):
+        try:
+            domain_info = get_domain_info(url)
+            subdomains = get_subdomains(url)
+            assets = get_assets(url)
 
-        return jsonify({
-            'info': domain_info,
-            'subdomains': subdomains,
-            'asset_domains': assets
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+            st.header("Domain Information")
+            st.json(domain_info)
+
+            st.header("Subdomains")
+            st.write(subdomains)
+
+            st.header("Asset Domains")
+            st.json(assets)
+
+        except Exception as e:
+            st.error(f"An error occurred: {str(e)}")
 
 def get_domain_info(url):
-    hostname = url.split('//')[-1].split('/')[0]
+    hostname = urlparse(url).netloc
     ip = socket.gethostbyname(hostname)
     response = requests.get(f'https://ipinfo.io/{ip}/json')
     data = response.json()
@@ -44,8 +46,7 @@ def get_domain_info(url):
     }
 
 def get_subdomains(url):
-    # Example of subdomain retrieval using a DNS service
-    hostname = url.split('//')[-1].split('/')[0]
+    hostname = urlparse(url).netloc
     subdomains = []
 
     try:
@@ -102,4 +103,4 @@ def get_assets(url):
     return assets
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    main()
